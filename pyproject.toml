@@ -1,0 +1,12 @@
+[project]
+name = "quizchirp"
+description = "做个鸟测评 · 又要测评？左键三下，让鸟作答 / Another quiz? Three clicks. The bird’s got this"
+version = "0.1.0"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "openai-codex", "pystray", "pillow", "pynput", "mss>=10",
+    "sounddevice", "filelock", "platformdirs",
+]
+
+[tool.uv]
+environments = ["sys_platform == 'win32' and platform_machine == 'AMD64'", "sys_platform == 'darwin'"]

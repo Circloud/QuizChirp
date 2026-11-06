@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0"><dict>
+<key>CFBundleExecutable</key><string>launch</string>
+<key>CFBundleIdentifier</key><string>org.quizchirp.tray</string>
+<key>CFBundleName</key><string>QuizChirp</string>
+<key>CFBundleDisplayName</key><string>QuizChirp</string>
+<key>CFBundleDevelopmentRegion</key><string>en</string>
+<key>CFBundleIconFile</key><string>QuizChirp.icns</string>
+<key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleVersion</key><string>1</string>
+<key>LSUIElement</key><true/>
+</dict></plist>

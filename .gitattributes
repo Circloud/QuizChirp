@@ -1,0 +1,4 @@
+* text=auto
+*.command text eol=lf
+QuizChirp.app/Contents/MacOS/launch text eol=lf
+*.cmd text eol=crlf

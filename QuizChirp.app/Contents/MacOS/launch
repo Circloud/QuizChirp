@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")/../../.."
+chmod +x Start.command
+exec /usr/bin/open -a Terminal "$PWD/Start.command"

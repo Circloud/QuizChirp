@@ -1,0 +1,29 @@
+The finch-*.wav files are excerpts of real Bengalese finch recordings by David Nicholson,
+Jonah E. Queen and Samuel J. Sober, Bengalese Finch Song Repository (Figshare).
+Source: https://doi.org/10.6084/m9.figshare.4805749.v9
+License for the source and these adaptations: CC BY 4.0
+https://creativecommons.org/licenses/by/4.0/
+
+Source archives (bird ID, Figshare download URL, original archive MD5):
+gy6or6    https://ndownloader.figshare.com/files/41668992  4441c716563965db4c1522346f99a064
+or60yw70  https://ndownloader.figshare.com/files/41668968  af3c1725f94a32cb159479e2e1f29a03
+bl26lb16  https://ndownloader.figshare.com/files/41669010  faf8bdec9e094a5937f84817892eeaa7
+gr41rd51  https://ndownloader.figshare.com/files/41669007  52800a771e454cd8d876ed37534ce789
+
+The 50 answer calls are distinct recorded performances. Some share a
+syllable type. The stored WAV files retain their original pitch and speed.
+File processing consists of cropping, peak normalization, 2 ms edge fades
+and padding answer clips to 115 ms. At playback, QuizChirp applies a random
+gain of -3 to +2 dB and a pitch/speed shift of up to +/-0.8 semitones,
+with a peak headroom limit. Each answer repeats the same processed note
+with fixed pauses. These playback changes do not modify the source WAVs.
+tools/sound_clips.csv lists the source file, annotated syllable, original
+32 kHz sample interval (end exclusive) and the RMS level difference
+between the syllable and the adjacent 6 ms on either side, in decibels.
+Pass all four archives to tools/build_sounds.py to reproduce the WAVs.
+
+FAIL.wav: Northern Cardinal (Cardinalis cardinalis), recorded by Jonathon Jongsma.
+Source: https://commons.wikimedia.org/wiki/File:Cardinalis_cardinalis_-_Northern_Cardinal_XC75501.mp3
+License: CC BY-SA 3.0, https://creativecommons.org/licenses/by-sa/3.0/
+Intermediate excerpt: https://github.com/kgkgzrtk/birdwatch/blob/main/assets/birds/samples/cardinal.wav
+Changes: mono conversion, crop of intermediate excerpt at source frames 31900 through 51040, resampling to 32 kHz, gain adjustment and 2.5 ms edge fades. Original pitch and speed retained.

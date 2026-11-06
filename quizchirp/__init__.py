@@ -1,0 +1,1 @@
+"""QuizChirp desktop application."""
