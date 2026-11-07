@@ -21,7 +21,7 @@ SECTIONS = {
         "log_level": "DEBUG/INFO retain all screenshots and SDK history; WARNING/ERROR retain only failed or unsubmitted screenshots.",
     },
     "runtime": {
-        "codex_bin": "Managed by the launcher. Empty enables automatic executable discovery.",
+        "codex_bin": "Codex executable path. Empty enables discovery; use Recheck Codex after editing during setup.",
     },
 }
 

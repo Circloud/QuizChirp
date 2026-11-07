@@ -4,9 +4,21 @@ description = "做个鸟测评 · 又要测评？左键三下，让鸟作答 / A
 version = "0.1.0"
 requires-python = ">=3.12,<3.15"
 dependencies = [
-    "openai-codex", "pystray", "pillow", "pynput", "mss>=10",
-    "sounddevice", "filelock", "platformdirs",
+    "openai-codex",
+    "pystray",
+    "pillow",
+    "pynput",
+    "mss>=10",
+    "sounddevice",
+    "filelock",
+    "platformdirs",
+    "certifi>=2026.10.23",
 ]
 
 [tool.uv]
 environments = ["sys_platform == 'win32' and platform_machine == 'AMD64'", "sys_platform == 'darwin'"]
+
+[dependency-groups]
+build = [
+    "pyinstaller>=6.15,<7",
+]

@@ -76,7 +76,7 @@ def main():
         def drive():
             try:
                 deadline = time.monotonic() + 45
-                while tray.status == "Starting" and time.monotonic() < deadline:
+                while tray.status in ("Starting", "Checking Codex") and time.monotonic() < deadline:
                     time.sleep(0.2)
                 assert tray.status == "Ready", tray.status
                 point = (mon["left"] + 110, mon["top"] + 100)

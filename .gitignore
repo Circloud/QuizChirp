@@ -12,3 +12,6 @@ docs/
 .pytest_cache/
 .DS_Store
 Thumbs.db
+build/
+dist/
+.build-venv/

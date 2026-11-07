@@ -21,7 +21,7 @@ from .audio import Audio
 from .core import Gate
 from .config import Settings
 from .paths import prepare_data_directory
-from .shortcuts import ensure_shortcuts
+from . import runtime
 from .i18n import Translator
 from .desktop import capture, check_capture, click_settings, permissions, open_config
 from .answers import ANSWERS, CHOICES
@@ -32,6 +32,7 @@ SCREEN_ACCESS_REQUIRED = "Allow screen access, then trigger again"
 INPUT_ACCESS_REQUIRED = "Allow input access, then retry; restart if needed"
 RETRYABLE_STATUSES = ("Usage limit reached", "Connection unavailable", "Request failed",
                       SCREEN_ACCESS_REQUIRED, ACCESS_UNVERIFIED, "Sign-in required")
+RUNTIME_IDLE = ("No compatible Codex found", "Codex preparation failed")
 
 if sys.platform == "win32":
     from pystray._util import win32
@@ -83,7 +84,11 @@ class Tray:
         LOG.info("Starting QuizChirp data=%s log_level=%s", directory, self.settings.log_level)
         self.shots = directory / "screenshots"
         self.shots.mkdir(exist_ok=True)
-        self.engine = Engine(directory, self.settings)
+        self.engine = None
+        self.runtime_task = None
+        self.runtime_cancel = threading.Event()
+        self.runtime_progress = None
+        self.runtime_error = None
         self.audio = Audio(directory, self.settings)
         self.gate = Gate(*click_settings(), timeout=self.settings.timeout_seconds,
                          trigger_mode=self.settings.trigger_mode)
@@ -112,6 +117,11 @@ class Tray:
     def action_done(self, future, function=None, args=()):
         if not future.cancelled() and future.exception() and not self.closed:
             LOG.error("Tray action failed: %s", type(future.exception()).__name__)
+            if self.engine is None:
+                if self.runtime_task is None:
+                    self.runtime_error = "Check connection, disk space and runtime path"
+                    self.set_status("Codex preparation failed")
+                return
             if self.gate.current is None and self.status not in ("Starting", "Working", "Waiting for sign-in"):
                 if function and function.__name__ in ("open_configuration", "select_audio", "select_trigger"):
                     self.failed_operation = ("action", (function, args))
@@ -121,7 +131,17 @@ class Tray:
 
     def items(self):
         text = self.text
-        yield Item(text(self.status), None, enabled=False)
+        label = text(self.status)
+        if self.status == "Downloading Codex" and self.runtime_progress is not None:
+            label += f" · {self.runtime_progress}%"
+        yield Item(label, None, enabled=False)
+        if self.status in RUNTIME_IDLE:
+            if self.runtime_error:
+                yield Item(text(self.runtime_error), None, enabled=False)
+            yield Item(text("Download Codex"), self.action(self.prepare_runtime, True))
+            yield Item(text("Recheck Codex"), self.action(self.prepare_runtime))
+        if self.status in ("Downloading Codex", "Preparing Codex"):
+            yield Item(text("Cancel download"), self.action(self.cancel_runtime))
         if self.status == "Sign-in required":
             yield Item(text("Sign in with ChatGPT..."), self.action(self.sign_in))
         if self.status == "Waiting for sign-in":
@@ -155,7 +175,8 @@ class Tray:
         if self.closed:
             return
         self.status = value
-        self.gate.enable(value in ("Ready", "Sign-in required", "Waiting for sign-in", *RETRYABLE_STATUSES))
+        self.gate.enable(self.engine is not None and value in (
+            "Ready", "Sign-in required", "Waiting for sign-in", *RETRYABLE_STATUSES))
         self.update()
 
     async def open_configuration(self):
@@ -184,7 +205,65 @@ class Tray:
             LOG.warning("Audio output unavailable: %s", type(exc).__name__)
         self.update()
 
+    def runtime_download_progress(self, percent):
+        if self.closed or self.runtime_cancel.is_set():
+            return
+        status = "Preparing Codex" if percent is None else "Downloading Codex"
+        if status != self.status or percent != self.runtime_progress:
+            self.runtime_progress = percent
+            self.set_status(status)
+
+    async def cancel_runtime(self):
+        if self.runtime_task is None:
+            return
+        self.runtime_cancel.set()
+        self.set_status("Cancelling download")
+
+    async def prepare_runtime(self, download=False):
+        if self.closed or self.runtime_task is not None or self.engine is not None:
+            return
+        self.runtime_task = asyncio.current_task()
+        self.runtime_cancel.clear()
+        self.runtime_error = None
+        self.runtime_progress = None
+        self.set_status("Downloading Codex" if download else "Checking Codex")
+        try:
+            if download:
+                def progress(percent):
+                    self.loop.call_soon_threadsafe(self.runtime_download_progress, percent)
+                path = await asyncio.to_thread(runtime.download, self.directory, self.runtime_cancel, progress)
+            else:
+                saved = Settings.load(self.directory).codex_bin
+                path = await asyncio.to_thread(runtime.discover, saved, self.runtime_cancel)
+            if self.closed:
+                return
+            if self.runtime_cancel.is_set() or path is None:
+                self.set_status("No compatible Codex found")
+                return
+            # Preserve edits made through the configuration file during setup.
+            settings = Settings.load(self.directory)
+            settings.codex_bin = str(path)
+            settings.save(self.directory)
+            self.settings.codex_bin = str(path)
+            self.engine = Engine(self.directory, self.settings)
+            await self.recheck(startup=True)
+        except runtime.DownloadCancelled:
+            self.set_status("No compatible Codex found")
+        except Exception as exc:
+            if self.runtime_cancel.is_set():
+                self.set_status("No compatible Codex found")
+                return
+            LOG.exception("Codex preparation failed")
+            self.runtime_error = ("Runtime verification failed" if isinstance(exc, ValueError)
+                                  else "Check connection, disk space and runtime path")
+            self.set_status("Codex preparation failed")
+        finally:
+            self.runtime_task = None
+
     async def recheck(self, startup=False, request=None):
+        if self.engine is None:
+            await self.prepare_runtime()
+            return
         if (self.closed or self.check_task is not None or self.status in ("Working", "Waiting for sign-in")
                 or (self.gate.current is not None and self.gate.current != request)):
             return
@@ -381,10 +460,12 @@ class Tray:
                     self.update()
                 await asyncio.sleep(4)
         discovery = asyncio.create_task(refresh_audio())
-        startup = asyncio.create_task(self.recheck(startup=True))
+        startup = asyncio.create_task(self.prepare_runtime())
         await self.stop_event.wait()
         discovery.cancel()
-        startup.cancel()
+        self.runtime_cancel.set()
+        if self.runtime_task:
+            await asyncio.gather(self.runtime_task, return_exceptions=True)
         if self.listener:
             self.listener.stop()
         if self.login:
@@ -398,7 +479,8 @@ class Tray:
             await asyncio.gather(self.check_task, return_exceptions=True)
         self.pending_screenshots.clear()
         await asyncio.gather(discovery, startup, return_exceptions=True)
-        await self.engine.client.close()
+        if self.engine:
+            await self.engine.client.close()
 
     def work(self):
         asyncio.set_event_loop(self.loop)
@@ -409,6 +491,7 @@ class Tray:
             for task in pending:
                 task.cancel()
             self.loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
+            self.loop.run_until_complete(self.loop.shutdown_default_executor())
             self.loop.close()
 
     def quit(self, icon=None, item=None):
@@ -442,7 +525,6 @@ def main():
                 level=logging.WARNING, format="%(asctime)s %(levelname)s %(name)s %(message)s")
             try:
                 tray = Tray(directory)
-                ensure_shortcuts(directory, tray.settings.language)
                 tray.run()
             except Exception:
                 LOG.exception("Desktop startup failed")
