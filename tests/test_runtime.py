@@ -32,6 +32,7 @@ class Runtime(unittest.IsolatedAsyncioTestCase):
         self.tray.failed_operation = None
         self.tray.login = None
         self.tray.pending_screenshots = []
+        self.tray.runtime_error = None
 
     def claim(self, capture_only=False):
         self.tray.gate.serial += 1
@@ -299,7 +300,9 @@ class Runtime(unittest.IsolatedAsyncioTestCase):
             await self.tray.recheck(startup=True)
         listener.assert_not_called()
         self.assertEqual(self.tray.status, INPUT_ACCESS_REQUIRED)
-        self.assertFalse(self.tray.gate.ready)
+        # The retry state accepts events if the OS can deliver them; with no
+        # input permission, the user must use the tray Retry action instead.
+        self.assertTrue(self.tray.gate.ready)
         with patch("quizchirp.app.permissions", return_value=True), patch("quizchirp.app.mouse.Listener") as listener:
             listener.return_value.is_alive.return_value = True
             await self.tray.recheck()

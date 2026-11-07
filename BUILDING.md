@@ -34,9 +34,17 @@ archive. To update Windows, extract a fresh build and move the existing `data/`
 directory into it after quitting the old app. On macOS, replace the `.app`.
 
 Manual runtime paths can be entered in `[runtime].codex_bin` through **Open
-configuration file**, followed by **Recheck Codex** during setup. Other file
+configuration file**, followed by **Retry** during setup. Other file
 edits require a restart. Download cancellation can take up to the current
 network timeout or runtime probe to finish.
+
+Startup, tray Retry and mouse-triggered recovery share the same checks. In any
+idle error state, a mouse trigger checks input access, the runtime, screen access
+and account availability, then continues that trigger's capture or submission.
+It never downloads Codex, opens a login page or requests a new OS permission.
+Downloads and login require explicit tray actions. In-progress states (including
+login) ignore extra triggers. Tray Retry checks recovery without submitting a
+question. Without input permission, use the tray because mouse events may not arrive.
 
 ## Desktop acceptance
 
