@@ -6,6 +6,7 @@ from quizchirp.shortcuts import ensure_shortcuts
 from quizchirp.i18n import Translator
 
 
+@patch('quizchirp.shortcuts.subprocess.CREATE_NO_WINDOW', 0x08000000, create=True)
 class Shortcuts(unittest.TestCase):
     def test_initial_language_and_create_once(self):
         for language in ('en', 'zh-CN'):
