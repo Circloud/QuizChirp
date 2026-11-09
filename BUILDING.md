@@ -21,9 +21,10 @@ does not verify desktop interaction or macOS privacy permissions.
 
 To publish, tag a verified commit already merged into `main`, then push that
 specific `v*` tag. The workflow tests and builds all three platforms, checks that
-the commit belongs to `main`, and publishes a GitHub Release with the ZIPs,
-SHA-256 files and generated release notes. Branch pushes and PRs never publish
-releases. Keep published version tags fixed; use a new version for changes.
+the commit belongs to `main`, and creates a GitHub Release draft with the ZIPs,
+SHA-256 files and generated release notes. Review and edit the notes on GitHub,
+then publish manually. No workflow publishes releases automatically. Keep
+published version tags fixed; use a new version for changes.
 
 ## Runtime and data
 

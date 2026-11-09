@@ -55,8 +55,8 @@ jobs:
           pattern: QuizChirp-*
           merge-multiple: true
           path: dist
-      - name: Publish release
+      - name: Create release draft
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.ref_name }}
-        run: gh release create "$RELEASE_TAG" dist/*.zip dist/*.sha256 --verify-tag --generate-notes
+        run: gh release create "$RELEASE_TAG" dist/*.zip dist/*.sha256 --verify-tag --generate-notes --draft
