@@ -13,10 +13,17 @@ The build creates a ZIP and a SHA-256 file in `dist/`. Windows contains a
 not need Python, uv, or the source checkout. Keep the complete Windows folder.
 macOS builds use ad-hoc signing, without Developer ID signing or notarization.
 
-The GitHub Actions workflow builds Windows x64, macOS Apple Silicon, and macOS
-Intel separately. It uploads build artifacts; it does not publish a Release.
+GitHub Actions runs the same tests on Windows x64, macOS Apple Silicon, and macOS
+Intel. Pull requests targeting `main` also build and upload ZIP artifacts; pushes
+to `main` only run tests. Manual workflow runs test and build without publishing.
 Download the appropriate ZIP inside the Actions artifact. A successful build
 does not verify desktop interaction or macOS privacy permissions.
+
+To publish, tag a verified commit already merged into `main`, then push that
+specific `v*` tag. The workflow tests and builds all three platforms, checks that
+the commit belongs to `main`, and publishes a GitHub Release with the ZIPs,
+SHA-256 files and generated release notes. Branch pushes and PRs never publish
+releases. Keep published version tags fixed; use a new version for changes.
 
 ## Runtime and data
 
