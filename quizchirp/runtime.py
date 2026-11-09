@@ -1,24 +1,36 @@
-"""Resolve a Codex executable before starting the tray; never check login."""
-import threading
+"""Discover or explicitly download a verified runtime without requiring Python tools."""
+import hashlib
+import json
 import os
+import platform
 import shutil
-import subprocess
+import ssl
 import sys
 import tempfile
-from importlib.metadata import version
-from pathlib import Path
+import threading
+import zipfile
+from pathlib import Path, PurePosixPath
+from urllib.request import urlopen
 
+import certifi
 from openai_codex import CodexConfig
 from openai_codex.client import CodexClient
 from openai_codex._runtime_requirements import require_runtime_version
-from .config import Settings
+
 from .engine import RUNTIME_OVERRIDES
-from .i18n import Translator
-from .paths import APP_ROOT, prepare_data_directory
+from .paths import APP_ROOT, data_directory
+
+
+class DownloadCancelled(Exception):
+    pass
+
+
+def executable_name():
+    return "codex.exe" if sys.platform == "win32" else "codex"
 
 
 def candidates(saved):
-    exe = "codex.exe" if sys.platform == "win32" else "codex"
+    exe = executable_name()
     if saved:
         yield Path(saved).expanduser()
     found = shutil.which(exe)
@@ -33,21 +45,20 @@ def candidates(saved):
                        Path("/Applications/Codex.app/Contents/Resources"),
                        Path.home() / "Applications/Codex.app/Contents/Resources"):
             yield folder / exe
-    yield APP_ROOT / ".runtime/codex_cli_bin/bin" / exe
+    yield data_directory() / "runtime/codex_cli_bin/bin" / exe
+    if not getattr(sys, "frozen", False):
+        yield APP_ROOT / ".runtime/codex_cli_bin/bin" / exe
 
 
 def probe(path):
-    # Disposable home prevents touching either application's credentials/history.
-    # Windows helpers can briefly retain handles after the SDK process exits.
-    # Cleanup failure must not turn a successful handshake into incompatibility.
     with tempfile.TemporaryDirectory(prefix="runtime-check-", ignore_cleanup_errors=True) as home:
-        client = CodexClient(CodexConfig(codex_bin=str(path), cwd=str(APP_ROOT),
+        client = CodexClient(CodexConfig(codex_bin=str(path), cwd=str(data_directory()),
             env={"CODEX_HOME": home}, config_overrides=RUNTIME_OVERRIDES))
-        client.start()
         timer = threading.Timer(15, client.close)
         timer.daemon = True
         timer.start()
         try:
+            client.start()
             client.initialize()
             require_runtime_version(client._runtime_version)
         finally:
@@ -65,60 +76,86 @@ def check(path):
         return False
 
 
-def download():
-    uv = os.environ.get("QUIZCHIRP_UV") or shutil.which("uv")
-    if not uv:
-        raise RuntimeError("uv")
-    subprocess.run([uv, "pip", "install", "--python", sys.executable,
-        "--target", str(APP_ROOT / ".runtime"), "--no-deps", "--no-cache",
-        f"openai-codex-cli-bin=={version('openai-codex')}"], check=True)
-    exe = "codex.exe" if sys.platform == "win32" else "codex"
-    return APP_ROOT / ".runtime/codex_cli_bin/bin" / exe
-
-
-def main():
-    directory = prepare_data_directory()
-    settings = Settings.load(directory)
-    text = Translator(settings.language)
-    print(text("Checking Codex runtime..."), flush=True)
+def discover(saved, cancelled):
     seen = set()
-    for path in candidates(settings.codex_bin):
+    for path in candidates(saved):
+        if cancelled.is_set():
+            return None
         key = str(path.resolve())
         if key not in seen and check(path):
-            settings.codex_bin = key
-            settings.save(directory)
-            return 0
+            return path.resolve()
         seen.add(key)
-    while True:
-        print(text("No compatible Codex runtime found."))
-        print(text("1. Download into the project (about 450 MB)"))
-        print(text("2. Enter the path to {exe}").format(
-            exe="codex.exe" if sys.platform == "win32" else "codex"))
-        print(text("3. Exit"))
-        choice = input(text("Choose: ")).strip()
-        if choice == "3":
-            return 1
-        if choice == "1":
-            print(text("Downloading Codex runtime..."), flush=True)
-            try:
-                path = download()
-            except (OSError, RuntimeError, subprocess.CalledProcessError):
-                print(text("Download failed. Check your connection and try again."))
-                continue
-        elif choice == "2":
-            path = Path(input(text("Executable path: ")).strip().strip('\"').strip("'")).expanduser()
-        else:
-            print(text("Enter 1, 2, or 3."))
-            continue
-        if check(path):
-            settings.codex_bin = str(path.resolve())
-            settings.save(directory)
-            return 0
-        print(text("Cannot use this runtime. Check the path and version, or download a compatible copy."))
+    return None
 
 
-if __name__ == "__main__":
-    try:
-        raise SystemExit(main())
-    except (EOFError, KeyboardInterrupt):
-        raise SystemExit(1)
+def download_spec():
+    manifest = json.loads(Path(__file__).with_name("runtime-downloads.json").read_text("utf-8"))
+    key = f"{sys.platform}-{platform.machine().lower()}"
+    if key not in manifest["platforms"]:
+        raise RuntimeError("Unsupported runtime platform")
+    return manifest["platforms"][key]
+
+
+def download(directory, cancelled, progress):
+    """Verify the pinned wheel before extracting; publish only a usable runtime."""
+    spec = download_spec()
+    root = directory / "runtime"
+    root.mkdir(parents=True, exist_ok=True)
+
+    def checkpoint():
+        if cancelled.is_set():
+            raise DownloadCancelled()
+
+    with tempfile.TemporaryDirectory(prefix="download-", dir=root) as temporary:
+        staging = Path(temporary)
+        archive = staging / "runtime.whl"
+        digest = hashlib.sha256()
+        received = 0
+        checkpoint()
+        context = ssl.create_default_context(cafile=certifi.where())
+        with urlopen(spec["url"], timeout=15, context=context) as response, archive.open("wb") as output:
+            while True:
+                checkpoint()
+                block = response.read(1024 * 1024)
+                if not block:
+                    break
+                output.write(block)
+                digest.update(block)
+                received += len(block)
+                progress(min(100, received * 100 // spec["size"]))
+        checkpoint()
+        if received != spec["size"] or digest.hexdigest() != spec["sha256"]:
+            raise ValueError("Runtime checksum mismatch")
+        progress(None)
+        with zipfile.ZipFile(archive) as wheel:
+            for entry in wheel.infolist():
+                checkpoint()
+                relative = PurePosixPath(entry.filename)
+                if (relative.is_absolute() or ".." in relative.parts or "\\" in entry.filename
+                        or any(":" in part for part in relative.parts)):
+                    raise ValueError("Unsafe runtime archive")
+                if entry.is_dir() or relative.parts[0] != "codex_cli_bin":
+                    continue
+                target = staging.joinpath(*relative.parts)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                with wheel.open(entry) as source, target.open("wb") as output:
+                    while block := source.read(1024 * 1024):
+                        checkpoint()
+                        output.write(block)
+                mode = (entry.external_attr >> 16) & 0o777
+                if os.name != "nt":
+                    target.chmod(mode or 0o644)
+        package = staging / "codex_cli_bin"
+        binary = package / "bin" / executable_name()
+        if os.name != "nt" and binary.exists():
+            binary.chmod(binary.stat().st_mode | 0o111)
+        checkpoint()
+        if not check(binary):
+            raise RuntimeError("Downloaded runtime is incompatible")
+        checkpoint()
+        destination = root / "codex_cli_bin"
+        # This directory belongs exclusively to the downloaded runtime, not user data.
+        if destination.exists():
+            shutil.rmtree(destination)
+        package.replace(destination)
+        return destination / "bin" / executable_name()

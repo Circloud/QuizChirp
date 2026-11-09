@@ -1,0 +1,20 @@
+{
+  "version": "0.163.0",
+  "platforms": {
+    "darwin-x86_64": {
+      "url": "https://files.pythonhosted.org/packages/da/15/d83ddbe97e5eb691e77afed6772c01fc8878fedd68aac129d56c312048fa/openai_codex_cli_bin-0.163.0-py3-none-macosx_10_9_x86_64.whl",
+      "sha256": "6b4a9e614e30442f9c2b804604b7fba12f218627f709fe5ba1960c01dac15ca1",
+      "size": 136246260
+    },
+    "darwin-arm64": {
+      "url": "https://files.pythonhosted.org/packages/d1/c2/a26dc89782bb9fd94d6efeee1d22677084aba89c28fcb34c4699e490dfb1/openai_codex_cli_bin-0.163.0-py3-none-macosx_11_0_arm64.whl",
+      "sha256": "dd0e6570930167f0e15ec94c5fb494a4a5a9dceb0a97113176c7b47c826cda05",
+      "size": 125132575
+    },
+    "win32-amd64": {
+      "url": "https://files.pythonhosted.org/packages/a3/0e/ac903da78d517bb0c4f83ad52dd44a7eefddf23c806e147adc123e4e1d3c/openai_codex_cli_bin-0.163.0-py3-none-win_amd64.whl",
+      "sha256": "b759f212cc0deec6da9f297800797232c73d3f0d963842deaa02df965ee0b8b6",
+      "size": 153991643
+    }
+  }
+}

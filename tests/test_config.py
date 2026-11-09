@@ -149,8 +149,13 @@ class PortablePaths(unittest.TestCase):
         import os
         from quizchirp.paths import prepare_data_directory
         with tempfile.TemporaryDirectory() as root:
-            with patch("quizchirp.paths.APP_ROOT", Path(root)), patch.dict(os.environ), patch("tempfile.tempdir", None):
+            with patch("quizchirp.paths.APP_ROOT", Path(root)), patch("quizchirp.paths.sys.platform", "win32"), patch.dict(os.environ), patch("tempfile.tempdir", None):
                 directory = prepare_data_directory()
                 self.assertEqual(directory, Path(root) / "data")
                 self.assertEqual(Path(tempfile.gettempdir()), directory / "tmp")
                 self.assertTrue((directory / "tmp").is_dir())
+
+    def test_macos_data_is_outside_the_application(self):
+        from quizchirp.paths import data_directory
+        with patch("quizchirp.paths.sys.platform", "darwin"), patch("quizchirp.paths.Path.home", return_value=Path('/users/test')):
+            self.assertEqual(data_directory(), Path('/users/test/Library/Application Support/QuizChirp'))

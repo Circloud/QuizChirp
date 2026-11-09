@@ -1,0 +1,62 @@
+name: Test and build
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: ['main']
+  push:
+    branches: ['main']
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: Windows-x64
+          - os: macos-15
+            name: macOS-arm64
+          - os: macos-15-intel
+            name: macOS-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked --group build --python 3.14 --no-install-package openai-codex-cli-bin
+      - run: uv run --no-sync python -m unittest discover -s tests
+        env:
+          PYTHONUTF8: '1'
+      - run: uv run --no-sync python tools/build.py
+        if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/')
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/')
+        with:
+          name: QuizChirp-${{ matrix.name }}
+          if-no-files-found: error
+          path: |
+            dist/*.zip
+            dist/*.sha256
+  release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require a commit merged into main
+        run: git merge-base --is-ancestor HEAD origin/main
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: QuizChirp-*
+          merge-multiple: true
+          path: dist
+      - name: Create release draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: gh release create "$RELEASE_TAG" dist/*.zip dist/*.sha256 --verify-tag --generate-notes --draft

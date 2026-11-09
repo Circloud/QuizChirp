@@ -17,9 +17,6 @@ if errorlevel 1 (
 )
 "%UV%" sync --locked --no-dev --python 3.14 --no-install-package openai-codex-cli-bin
 if errorlevel 1 goto failed
-set "QUIZCHIRP_UV=%UV%"
-".venv\Scripts\python.exe" -m quizchirp.runtime
-if errorlevel 1 goto failed
 powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference='Stop'; Start-Process -FilePath '.\.venv\Scripts\python.exe' -ArgumentList '-m','quizchirp.app' -WorkingDirectory (Get-Location).Path -WindowStyle Hidden"
 if errorlevel 1 goto failed
 popd
