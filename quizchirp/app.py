@@ -149,6 +149,7 @@ class Tray:
             yield Item(text("Cancel"), self.action(self.cancel_login))
         if self.status in RETRYABLE_STATUSES:
             yield Item(text("Retry"), self.action(self.recheck))
+        yield Menu.SEPARATOR
         names = [(text("System default"), None)] + [(name, name) for name in self.audio.outputs]
         def choice(label, key):
             return Item(label, self.action(self.select_audio, key),
