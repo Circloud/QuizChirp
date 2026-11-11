@@ -2,17 +2,29 @@
   <img src="quizchirp/assets/logo.png" width="160" alt="QuizChirp">
 </p>
 
-# QuizChirp
+<h1 align="center">QuizChirp</h1>
 
-**Another quiz? Three left clicks. Let the bird answer.**
+<p align="center">
+  <strong>Another quiz? Three left clicks. Let the bird answer.</strong>
+</p>
 
-[简体中文](README.md) · English
+<p align="center">
+  <a href="README.md">简体中文</a> · English
+</p>
 
-QuizChirp is for repetitive, meaningless online assessments that still have to be completed, such as online tests during autumn and spring recruitment. It captures screen content, asks Codex to answer, and conveys the answer through predefined *bird calls* to evade monitoring systems.
+<p align="center">
+  QuizChirp is for repetitive, meaningless online assessments that still have to be completed,<br>
+  such as online tests during autumn and spring recruitment.
+</p>
+
+<p align="center">
+  It captures screen content, asks Codex to answer,<br>
+  and conveys the answer through predefined <em>bird calls</em> to evade monitoring systems.
+</p>
 
 ## Applicable scenarios
 
-The following covers **online assessments conducted within a browser**, excluding those that require a locally installed exam client, local proctoring software, or attendance at a designated physical location.
+The following covers online assessments conducted within a browser, excluding those that require a locally installed exam client, local proctoring software, or attendance at a designated physical location.
 
 | Browser-based monitoring | How the design addresses it |
 | --- | --- |
@@ -35,9 +47,7 @@ The following covers **online assessments conducted within a browser**, excludin
 | The complete question fits on one screen | **Triple-click left** and wait for the bird-call answer. |
 | The question does not fit on one screen and needs two or more views | On the first view, **hold right + triple-click left** to collect the current screen (release right once the gesture is complete). Scroll to the next view and repeat. On the final view, **triple-click left without holding right** to submit all views together, then wait for the bird calls. |
 
-**1–6 bird calls correspond to A–F; a failure sound plays when no answer can be provided.** A–F follow the order of the choices, regardless of their original labels.
-
-Before starting, use **Preview sounds** in the tray to learn the answer and failure sounds, and **Audio output** to choose a playback device.
+**1–6 bird calls correspond to choices A–F in their order of appearance; a failure sound plays when no answer can be provided.** Answer sounds come from the [society finch (Bengalese finch)](https://en.wikipedia.org/wiki/Society_finch). Each answer uses a randomly selected recording with slight pitch and volume variations, so the sound varies; count the calls to identify the answer. Use **Preview sounds** in the tray to familiarize yourself with the sounds beforehand.
 
 <details>
 <summary>Which question is answered when several are visible or a question spans multiple views?</summary>
@@ -56,8 +66,6 @@ Before starting, use **Preview sounds** in the tray to learn the answer and fail
 3. Follow the tray / menu bar prompts to download Codex and sign in with ChatGPT as needed. Start using the app once the status shows **Ready**.
 
 <sub>Current builds do not use trusted publisher signing, and the macOS app is not notarized, so the first launch may encounter system security prompts.</sub>
-
-Bird recording credits and licenses: [Audio asset notes](quizchirp/sounds/LICENSE.txt).
 
 ## Disclaimer
 
