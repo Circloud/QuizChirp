@@ -21,6 +21,7 @@ from .audio import Audio
 from .core import Gate
 from .config import Settings
 from .paths import prepare_data_directory
+from .shortcuts import ensure_start_menu_shortcut
 from . import runtime
 from .i18n import Translator
 from .desktop import capture, check_capture, click_settings, permissions, open_config
@@ -542,6 +543,7 @@ def main():
                 maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8")],
                 level=logging.WARNING, format="%(asctime)s %(levelname)s %(name)s %(message)s")
             try:
+                ensure_start_menu_shortcut()
                 tray = Tray(directory)
                 tray.run()
             except Exception:

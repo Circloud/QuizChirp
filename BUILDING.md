@@ -1,4 +1,22 @@
-# Portable builds
+# Development and portable builds
+
+## Daily development
+
+Run from source with `Start.cmd` on Windows or `Start.command` on macOS.
+Source launches do not create shortcuts.
+Use source runs and relevant automated tests for routine changes; rebuilding a
+portable app is not required for each edit.
+
+When a portable test package is needed, push the commit and manually run the
+GitHub Actions **Test and build** workflow for that branch. Download the platform
+ZIP from the completed run's artifacts. Local `dist/` copies do not update when
+the source changes.
+
+Test the packaged application when changing packaging, dependencies, resource
+paths, startup, data locations or runtime discovery, and before a release.
+Local builds remain available for diagnosing packaging problems.
+
+## Local builds
 
 Build on the target operating system and architecture with Python 3.14:
 
@@ -12,6 +30,12 @@ The build creates a ZIP and a SHA-256 file in `dist/`. Windows contains a
 `QuizChirp` folder; macOS contains a standalone `QuizChirp.app`. End users do
 not need Python, uv, or the source checkout. Keep the complete Windows folder.
 macOS builds use ad-hoc signing, without Developer ID signing or notarization.
+
+On Windows, running the portable EXE creates or updates `QuizChirp` in the current
+user's Start Menu, without administrator access or a desktop shortcut. After
+moving the folder, run the EXE from its new location to refresh the shortcut.
+Deleting the portable folder does not remove the Start Menu shortcut; remove it
+manually. Shortcut creation failures are logged and do not stop the application.
 
 GitHub Actions runs the same tests on Windows x64, macOS Apple Silicon, and macOS
 Intel. Pull requests targeting `main` also build and upload ZIP artifacts; pushes
@@ -60,4 +84,5 @@ On a machine without Python or uv, check tray startup, external Codex discovery,
 explicit download/cancel/retry, login, sound preview, mouse triggers and multi-image
 submission. On macOS, additionally check first-open handling and screen/input
 permissions. Runtime downloads and authentication still need network access.
+On Windows, check the Start Menu shortcut and refresh after moving the folder.
 Desktop acceptance is separate from the automated regression suite.
