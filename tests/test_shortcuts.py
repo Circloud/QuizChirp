@@ -52,14 +52,16 @@ if ($saved.TargetPath -ne $executable -or
         with tempfile.TemporaryDirectory() as root:
             programs = Path(root) / "Programs"
             for folder in ("original space's $folder", "moved space's $folder"):
-                executable = Path(root) / folder / "QuizChirp.exe"
+                # Match the app's canonical path: Windows may expand 8.3 paths in links.
+                executable = (Path(root) / folder / "QuizChirp.exe").resolve()
                 executable.parent.mkdir()
                 executable.touch()
-                subprocess.run(
+                result = subprocess.run(
                     ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script],
                     env={**os.environ, "QUIZCHIRP_SHORTCUT_EXECUTABLE": str(executable),
                          "QUIZCHIRP_TEST_PROGRAMS": str(programs)},
-                    check=True, capture_output=True, timeout=15,
+                    capture_output=True, text=True, errors="replace", timeout=15,
                     creationflags=subprocess.CREATE_NO_WINDOW,
                 )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertEqual([p.name for p in programs.iterdir()], ["QuizChirp.lnk"])
