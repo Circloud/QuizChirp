@@ -30,7 +30,7 @@ class Settings:
     timeout_seconds: int = 300
     audio_output: str = ""
     log_level: str = "WARNING"
-    model: str = "gpt-6.1-sol"
+    model: str = "gpt-6.2-sol"
     thinking_effort: str = "medium"
     language: str = field(default_factory=system_language)
     codex_bin: str = ""

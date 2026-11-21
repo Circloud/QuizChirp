@@ -110,7 +110,7 @@ class Localization(unittest.TestCase):
                 settings = Settings.load(directory)
             self.assertEqual(settings.language, 'zh-CN')
             self.assertEqual(settings.log_level, 'WARNING')
-            self.assertEqual(settings.model, 'gpt-6.1-sol')
+            self.assertEqual(settings.model, 'gpt-6.2-sol')
             self.assertEqual(settings.thinking_effort, 'medium')
             with patch('quizchirp.i18n.sys.platform', 'linux'), patch('quizchirp.i18n.locale.getlocale', return_value=('en_US', 'UTF-8')):
                 self.assertEqual(Settings.load(directory).language, 'zh-CN')
