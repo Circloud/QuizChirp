@@ -13,60 +13,49 @@
 </p>
 
 <p align="center">
-  QuizChirp is for repetitive, meaningless online assessments that still have to be completed,<br>
-  such as online tests during autumn and spring recruitment.
+  QuizChirp is for browser-based assessments such as online tests during spring and autumn recruitment.<br>
+  It sends screenshots to Codex for answers and uses the number of bird calls to convey them and evade detection.
 </p>
-
-<p align="center">
-  It captures screen content, asks Codex to answer,<br>
-  and conveys the answer through predefined <em>bird calls</em> to evade monitoring systems.
-</p>
-
-## Applicable scenarios
-
-The following covers online assessments conducted within a browser, excluding those that require a locally installed exam client, local proctoring software, or attendance at a designated physical location.
-
-| Browser-based monitoring | How the design addresses it |
-| --- | --- |
-| Full-screen recording | ✅ Routine answering requires no chat window or visible answer text; feedback uses bird calls. |
-| Front-facing camera recording | ✅ No need to photograph questions with a phone, look at another screen, or speak questions aloud. |
-| Phone used as a second camera | ✅ Screen capture and bird-call feedback remove the need to photograph questions with a phone or consult a separate answer device. |
-| Microphone recording | ✅ No need to speak questions aloud; bird calls replace spoken answers, reducing direct exposure of question and choice content. |
-| Keystroke monitoring | ✅ Asking questions and collecting screenshots use only the mouse, without keyboard shortcuts such as Ctrl+C or Ctrl+V, so these actions generate no such key-combination events. |
-| Tab switching / window focus detection | ✅ Routine requests require no page switching or opening of a chat window. |
-| System audio recording | ✅ The number of bird calls conveys the choice without reading question or answer text aloud. |
-| Mouse activity recording | ✅ Simple mouse clicks submit questions without copying text, switching to a chat window, or pasting answers. |
-| Manual frame-by-frame review with magnification | ⚠️ Passing human review is not guaranteed, nor is freedom from detection or scrutiny of answering behavior. |
-
-## Usage
-
-**Launch QuizChirp and confirm the tray shows Ready → Use the mouse gesture on the question page → Listen for the answer**
-
-| Scenario | What to do |
-| --- | --- |
-| The complete question fits on one screen | **Triple-click left** and wait for the bird-call answer. |
-| The question does not fit on one screen and needs two or more views | On the first view, **hold right + triple-click left** to collect the current screen (release right once the gesture is complete). Scroll to the next view and repeat. On the final view, **triple-click left without holding right** to submit all views together, then wait for the bird calls. |
-
-**1–6 bird calls correspond to choices A–F in their order of appearance; a failure sound plays when no answer can be provided.** Answer sounds come from the [society finch (Bengalese finch)](https://en.wikipedia.org/wiki/Society_finch). Each answer uses a randomly selected recording with slight pitch and volume variations, so the sound varies; count the calls to identify the answer. Use **Preview sounds** in the tray to familiarize yourself with the sounds beforehand.
-
-<details>
-<summary>Which question is answered when several are visible or a question spans multiple views?</summary>
-
-- **Combine views before selecting a question.** Screenshots are read in submission order, joining continuations and overlapping content. A question’s text, choices, and supporting material can appear across different screenshots.
-- **Select the first eligible question.** In natural reading order, choose the first single-answer question with 2–6 choices whose full text, all choices, and required material are available. The pointer only determines which screen is captured; it does not select a question.
-- **Skip ineligible questions.** An incomplete question, a multiple-answer question, or one with seven choices is skipped in favor of a later eligible question. Choices are never removed to fit the limit. If no eligible question exists across the screenshots, a failure sound plays.
-- **Do not switch after selection.** Only the selected question is answered, even if a later one is easier. A failure sound plays if a unique correct choice cannot be determined, no choice is correct, or multiple choices are correct.
-
-</details>
 
 ## Quick start
 
 1. Download the application package for your platform from [Releases](https://github.com/Circloud/QuizChirp/releases) and extract it in full.
+
 2. On Windows, open `QuizChirp.exe`. On macOS, move `QuizChirp.app` to Applications and open it, allowing screen recording and input monitoring when prompted.
-3. Follow the tray / menu bar prompts to download Codex and sign in with ChatGPT as needed. Start using the app once the status shows **Ready**.
+
+3. QuizChirp looks for Codex on your system `PATH` and in common installation locations. It reuses the Codex sign-in it previously saved on your computer.
+
+   - **A compatible copy is installed but wasn't found**: Select **Open configuration file** and set `codex_bin` under `[runtime]` to the path of the Codex executable. Save the file and select **Retry**.
+   - **No compatible copy is installed**: Select **Download Codex**.
 
 <sub>Current builds do not use trusted publisher signing, and the macOS app is not notarized, so the first launch may encounter system security prompts.</sub>
 
+## Usage
+
+1. **Check that QuizChirp is ready**: Open the app and confirm that the tray or menu bar shows **Ready**.
+
+2. **Submit the question**: Open the assessment page.
+
+   - **Single-screen question**: **Triple-click the left mouse button** to submit it.
+   - **Question that requires scrolling**: For each view before the final one, **hold the right mouse button and triple-click the left mouse button** to save the screenshot. Release the right button after the gesture, then scroll and repeat. On the final view, **triple-click the left mouse button** on its own to submit all views together.
+
+3. **Listen for the answer**: One to six bird calls correspond to the first through sixth choices (A–F). A failure sound plays if QuizChirp can't determine a single correct choice. Use **Preview sounds** in the tray to get familiar with the sounds.
+
+<details>
+<summary>Which question is answered when a question spans multiple views or several questions are visible?</summary>
+
+- **Combine the views**: Codex reads the screenshots in submission order, joining continuations and overlapping content. A question's text, choices, and supporting material can appear in different screenshots. The pointer determines which display to capture.
+- **Select the first eligible question in reading order**: It must be a single-answer question with 2–6 choices and include the full question, all choices, and any required material. For example, if the first question is missing choices, allows multiple answers, or has seven choices, Codex looks for the next eligible question.
+- **Answer only the selected question**: A failure sound plays if no question qualifies or if Codex can't determine a single correct choice for the selected question.
+
+</details>
+
+## Supported assessments
+
+QuizChirp is intended for browser-based assessments. Assessments that require an installed exam client, local proctoring software, or attendance at a designated venue are outside its scope.
+
 ## Disclaimer
 
-This project is for learning and discussion. Follow assessment rules and do not use it where external assistance is explicitly prohibited. Neither answer accuracy nor monitoring evasion is guaranteed. The Codex client runs locally, but screenshots are sent to the AI service in use; take care with sensitive information. Users assume the risks and consequences of use, and the developer accepts no responsibility for consequences arising from use or misuse.
+This project is for learning and discussion. Follow assessment rules and do not use it where external assistance is explicitly prohibited. Neither answer accuracy nor monitoring evasion is guaranteed. The Codex client runs locally and sends screenshots to the AI service in use. Take care with sensitive information. Users assume the risks and consequences of use, and the developer accepts no responsibility for consequences arising from use or misuse.
+
+[Audio sources and licenses](quizchirp/sounds/LICENSE.txt)
