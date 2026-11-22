@@ -17,7 +17,7 @@
   它把屏幕截图交给 Codex 作答，再用鸟鸣次数提示答案以规避检测。
 </p>
 
-https://github.com/user-attachments/assets/ba808b49-90bf-4ddb-b89f-c528b7a771ba
+https://github.com/user-attachments/assets/23558c15-763a-49f9-8a9a-3e95c632ad55
 
 ## 快速开始
 
