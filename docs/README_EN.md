@@ -13,13 +13,11 @@
 </p>
 
 <p align="center">
-  QuizChirp is for browser-based assessments such as online tests during spring and autumn recruitment.<br>
+  QuizChirp is for browser-based assessments such as practice tests for spring and autumn recruitment.<br>
   It sends screenshots to Codex for answers and uses the number of bird calls to convey them and evade detection.
 </p>
 
 https://github.com/user-attachments/assets/23558c15-763a-49f9-8a9a-3e95c632ad55
-
-[Original demo video](demo.mp4)
 
 ## Quick start
 
@@ -46,11 +44,23 @@ https://github.com/user-attachments/assets/23558c15-763a-49f9-8a9a-3e95c632ad55
 
 QuizChirp is intended for browser-based assessments. Assessments that require an installed exam client, local proctoring software, or attendance at a designated venue are outside its scope.
 
+| Browser-based monitoring | How the design addresses it |
+| --- | --- |
+| Full-screen recording | ✅ Routine answering requires no chat window or visible answer text; feedback uses bird calls. |
+| Front-facing camera recording | ✅ No need to photograph questions with a phone, look at another screen, or speak questions aloud. |
+| Phone used as a second camera | ✅ Screen capture and bird-call feedback remove the need to photograph questions with a phone or consult a separate answer device. |
+| Microphone recording | ✅ No need to speak questions aloud; bird calls replace spoken answers, reducing direct exposure of question and choice content. |
+| Keystroke monitoring | ✅ Asking questions and collecting screenshots use only the mouse, without keyboard shortcuts such as Ctrl+C or Ctrl+V, so these actions generate no such key-combination events. |
+| Tab switching / window focus detection | ✅ Routine requests require no page switching or opening of a chat window. |
+| System audio recording | ✅ The number of bird calls conveys the choice without reading question or answer text aloud. |
+| Mouse activity recording | ✅ Simple mouse clicks submit questions without copying text, switching to a chat window, or pasting answers. |
+| Manual frame-by-frame review with magnification | ⚠️ Passing human review is not guaranteed, nor is freedom from detection or scrutiny of answering behavior. |
+
 ## Disclaimer
 
-This project is for learning and discussion. Follow assessment rules and do not use it where external assistance is explicitly prohibited. Neither answer accuracy nor monitoring evasion is guaranteed. The Codex client runs locally and sends screenshots to the AI service in use. Take care with sensitive information. Users assume the risks and consequences of use, and the developer accepts no responsibility for consequences arising from use or misuse.
+This project is for learning and discussion only. **Use in formal exams is strictly prohibited.** Do not use it in official assessments or other settings where outside assistance is prohibited.
 
-[Audio sources and licenses](../quizchirp/sounds/LICENSE.txt)
+This project provides no guarantee of answer accuracy or evasion of detection. Users assume all risks, responsibilities, and consequences arising from its use. The developer accepts no liability.
 
 ## FAQ
 
