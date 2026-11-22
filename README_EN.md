@@ -17,6 +17,8 @@
   It sends screenshots to Codex for answers and uses the number of bird calls to convey them and evade detection.
 </p>
 
+https://github.com/user-attachments/assets/23558c15-763a-49f9-8a9a-3e95c632ad55
+
 ## Quick start
 
 1. Download the application package for your platform from [Releases](https://github.com/Circloud/QuizChirp/releases) and extract it in full.
