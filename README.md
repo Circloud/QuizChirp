@@ -17,6 +17,8 @@
   它把屏幕截图交给 Codex 作答，再用鸟鸣次数提示答案以规避检测。
 </p>
 
+https://github.com/user-attachments/assets/ba808b49-90bf-4ddb-b89f-c528b7a771ba
+
 ## 快速开始
 
 1. 从 [Releases](https://github.com/Circloud/QuizChirp/releases) 下载对应平台的应用包并完整解压。
