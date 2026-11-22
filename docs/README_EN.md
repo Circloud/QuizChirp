@@ -62,6 +62,10 @@ This project is for learning and discussion only. **Use in formal exams is stric
 
 This project provides no guarantee of answer accuracy or evasion of detection. Users assume all risks, responsibilities, and consequences arising from its use. The developer accepts no liability.
 
+## License
+
+QuizChirp's original code is licensed under the [MIT License](../LICENSE). Third-party audio and dependencies retain their own licenses. Third-party content shown in the demo belongs to its respective rights holders.
+
 ## FAQ
 
 <details>
