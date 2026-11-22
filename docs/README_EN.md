@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="quizchirp/assets/logo.png" width="160" alt="QuizChirp">
+  <img src="../quizchirp/assets/logo.png" width="160" alt="QuizChirp">
 </p>
 
 <h1 align="center">QuizChirp</h1>
@@ -18,6 +18,8 @@
 </p>
 
 https://github.com/user-attachments/assets/23558c15-763a-49f9-8a9a-3e95c632ad55
+
+[Original demo video](demo.mp4)
 
 ## Quick start
 
@@ -48,7 +50,7 @@ QuizChirp is intended for browser-based assessments. Assessments that require an
 
 This project is for learning and discussion. Follow assessment rules and do not use it where external assistance is explicitly prohibited. Neither answer accuracy nor monitoring evasion is guaranteed. The Codex client runs locally and sends screenshots to the AI service in use. Take care with sensitive information. Users assume the risks and consequences of use, and the developer accepts no responsibility for consequences arising from use or misuse.
 
-[Audio sources and licenses](quizchirp/sounds/LICENSE.txt)
+[Audio sources and licenses](../quizchirp/sounds/LICENSE.txt)
 
 ## FAQ
 

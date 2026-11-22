@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="quizchirp/assets/logo.png" width="160" alt="做个鸟测评">
+  <img src="../quizchirp/assets/logo.png" width="160" alt="做个鸟测评">
 </p>
 
 <h1 align="center">「做个鸟测评」</h1>
@@ -18,6 +18,8 @@
 </p>
 
 https://github.com/user-attachments/assets/23558c15-763a-49f9-8a9a-3e95c632ad55
+
+[演示视频文件](demo.mp4)
 
 ## 快速开始
 
@@ -48,7 +50,7 @@ https://github.com/user-attachments/assets/23558c15-763a-49f9-8a9a-3e95c632ad55
 
 本项目仅供学习交流，请遵守测评规则，勿用于明确禁止外部辅助的场景。项目不保证答案准确性或规避检测的效果。Codex 客户端在本地运行，截图仍会提交至所使用的 AI 服务，请注意敏感信息。使用风险及后果由使用者自行承担，开发者不对使用或滥用造成的后果负责。
 
-[音频来源与许可](quizchirp/sounds/LICENSE.txt)
+[音频来源与许可](../quizchirp/sounds/LICENSE.txt)
 
 ## FAQ
 

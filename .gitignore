@@ -4,7 +4,10 @@ __pycache__/
 data/
 .python/
 .runtime/
-docs/
+docs/*
+!docs/README.md
+!docs/README_EN.md
+!docs/demo.mp4
 .env
 .env.*
 !.env.example
